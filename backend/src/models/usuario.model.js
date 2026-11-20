@@ -1,14 +1,13 @@
-const { conectarDB } = require('../config/database');
+const { conectarDB } = require("../config/database")
 
 const obtenerUsuario = async (usuario, passwordSHA1) => {
-    try {
+  try {
+    const pool = await conectarDB()
 
-        const pool = await conectarDB();
-
-        const resultado = await pool.request()
-            .input('usuario', usuario)
-            .input('passwordSHA1', passwordSHA1)
-            .query(`
+    const resultado = await pool
+      .request()
+      .input("usuario", usuario)
+      .input("passwordSHA1", passwordSHA1).query(`
                 SELECT
                     U_ID_Usuario,
                     U_Nombre,
@@ -22,15 +21,14 @@ const obtenerUsuario = async (usuario, passwordSHA1) => {
                 FROM [@ATCL_USUARIO]
                 WHERE U_Usuario = @usuario and U_Clave = @passwordSHA1
                 and U_ID_Area IN ('8','16','22','21')
-            `);
+            `)
 
-        return resultado.recordset[0] || null;
-
-    } catch (error) {
-        throw error;
-    }
-};
+    return resultado.recordset[0] || null
+  } catch (error) {
+    throw error
+  }
+}
 
 module.exports = {
-    obtenerUsuario
-};
+  obtenerUsuario,
+}

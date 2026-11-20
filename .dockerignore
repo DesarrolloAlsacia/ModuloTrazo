@@ -1,0 +1,12 @@
+.git
+**/node_modules
+**/.npm-cache
+**/.next
+**/dist
+**/.env
+**/*.local.json
+*.zip
+.pm2-local
+backend/logs
+backend/data
+backend/bin
