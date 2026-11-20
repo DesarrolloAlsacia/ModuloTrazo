@@ -1,0 +1,11 @@
+**/node_modules/
+**/.npm-cache/
+.pm2-local/
+frontend/dist/
+frontend/.next/
+backend/bin/
+backend/data/
+backend/logs/
+**/*.local.json
+**/.env
+*.zip
