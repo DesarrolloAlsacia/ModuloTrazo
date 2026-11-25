@@ -1,8 +1,9 @@
 "use client"
 
-import { useSesion } from "../lib/sesion-context.jsx"
+import PantallaCarga from "../components/ui/PantallaCarga.jsx"
+import { useSesion } from "./_hooks/sesion-context.jsx"
 
 export default function Home() {
   useSesion()
-  return <p role="status">Cargando Trazo…</p>
+  return <PantallaCarga />
 }

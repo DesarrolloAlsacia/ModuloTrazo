@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useMemo } from "react"
-import { useImpresion } from "./services/useImpresion.js"
+import { useImpresion } from "./useImpresion.js"
 
 const ImpresionContext = createContext(null)
 

@@ -1,7 +1,7 @@
 "use client"
 
-import { Alertas } from "../../../components/views/AlertasView.jsx"
-import { useDatos } from "../../../lib/impresion-context.jsx"
+import { Alertas } from "./_components/AlertasView.jsx"
+import { useDatos } from "../_hooks/impresion-context.jsx"
 
 export default function AlertasPage() {
   return <Alertas {...useDatos()} />

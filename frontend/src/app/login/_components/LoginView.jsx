@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { mascotUrl } from "../../lib/branding.js"
-import Icon from "../Icon.jsx"
-import { login } from "../../lib/services/login.service.js"
+import { mascotUrl } from "../../../lib/branding.js"
+import Icon from "../../../components/ui/Icon.jsx"
+import { login } from "../../../lib/services/login.service.js"
 
 export default function LoginView({ mensaje, onAuthenticated }) {
   const [error, setError] = useState(null)

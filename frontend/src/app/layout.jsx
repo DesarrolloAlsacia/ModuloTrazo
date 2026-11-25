@@ -1,5 +1,5 @@
 import "./globals.css"
-import { SesionProvider } from "../lib/sesion-context.jsx"
+import { SesionProvider } from "./_hooks/sesion-context.jsx"
 
 export const metadata = {
   title: "Trazo",

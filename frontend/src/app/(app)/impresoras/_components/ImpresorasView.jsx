@@ -1,7 +1,9 @@
-import { useEffect, useId, useRef, useState } from "react"
+import { useId, useRef, useState } from "react"
 import Link from "next/link"
-import { Titulo } from "./components.jsx"
-import TrabajosView, { estados as nombresDeEstado } from "./TrabajosView.jsx"
+import CargaTarjeta from "../../../../components/ui/CargaTarjeta.jsx"
+import Spinner from "../../../../components/ui/Spinner.jsx"
+import { Titulo } from "../../../../components/ui/Titulo.jsx"
+import { estados as nombresDeEstado } from "../../../../lib/estados-trabajo.js"
 import Configuracion from "./ConfiguracionModal.jsx"
 
 function ResumenTrabajos({
@@ -183,7 +185,16 @@ function EstadoImpresora({ activa, guardando, error, onCambiar }) {
           onClick={onCambiar}
           disabled={guardando || typeof activa !== "boolean"}
         >
-          {guardando ? "Guardando…" : activa === true ? "Inactivar" : "Activar"}
+          {guardando ? (
+            <span className="inline-flex items-center gap-2">
+              <Spinner className="size-3" etiqueta="Guardando estado" />
+              Guardando…
+            </span>
+          ) : activa === true ? (
+            "Inactivar"
+          ) : (
+            "Activar"
+          )}
         </button>
       </div>
       {error && (
@@ -208,6 +219,7 @@ function TarjetaImpresora({
   colas,
   conexion,
   pendientes,
+  cargandoPendientes,
 }) {
   const [confirmado, setConfirmado] = useState(null)
   const [guardando, setGuardando] = useState(false)
@@ -256,6 +268,12 @@ function TarjetaImpresora({
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-20 bg-[repeating-linear-gradient(134deg,transparent_0px,transparent_9px,#3333335c_9px,#3333335c_11px),repeating-linear-gradient(136deg,transparent_0px,transparent_14px,#3333333d_14px,#3333333d_16px),repeating-linear-gradient(135deg,transparent_0px,transparent_23px,#25252529_23px,#25252529_24px)] opacity-90 blur-[0.35px] mix-blend-multiply"
+        />
+      )}
+      {cargandoPendientes && (
+        <CargaTarjeta
+          className="absolute inset-0 z-40"
+          mensaje={`Cargando impresora ${Code ?? ""}…`}
         />
       )}
       <div className="flex items-start gap-3">
@@ -309,7 +327,7 @@ function TarjetaImpresora({
         pendientes={pendientes}
       />
       <Link
-        className="mt-4 flex items-center justify-between rounded-[3px_7px_4px_9px] border-2! border-[#333]! bg-[#f5f5f1] p-4 font-[family-name:var(--hand)] hover:border-neutral-500 hover:bg-neutral-100"
+        className="mt-4 flex items-center justify-between rounded-[3px_7px_4px_9px] border-2! border-[#333]! bg-[#f5f5f1] p-4 font-[family-name:var(--hand)] hover:border-neutral-500 hover:bg-neutral-200"
         href={
           "/trabajos?" +
           new URLSearchParams({
@@ -334,76 +352,16 @@ export function Impresoras({
   configuracion,
   reconexion,
   onSincronizar,
+  impresoras,
+  cargando,
+  error,
+  estados,
+  cargandoEstados,
+  errorEstados,
+  errorConexion,
 }) {
-  const [impresoras, setImpresoras] = useState(null)
-  const [error, setError] = useState("")
-  const [estados, setEstados] = useState([])
-  const [errorEstados, setErrorEstados] = useState("")
-
-  useEffect(() => {
-    const solicitud = new AbortController()
-
-    async function cargar() {
-      try {
-        const respuesta = await fetch("/api/impresoras", {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("trazo_token"),
-          },
-          signal: solicitud.signal,
-        })
-        if (solicitud.signal.aborted) return
-        if (respuesta.status === 401) return sesionVencida()
-
-        const datos = await respuesta.json()
-        if (!respuesta.ok) throw new Error(datos.mensaje)
-        setImpresoras(datos.impresoras)
-      } catch (error) {
-        if (!solicitud.signal.aborted)
-          setError(error.message || "No se pudo cargar el inventario.")
-      }
-    }
-
-    cargar()
-    return () => solicitud.abort()
-  }, [sesionVencida])
-
-  useEffect(() => {
-    const solicitud = new AbortController()
-    setErrorEstados("")
-    async function cargarEstados() {
-      try {
-        const respuesta = await fetch("/api/impresoras/estados", {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("trazo_token"),
-          },
-          signal: solicitud.signal,
-        })
-        if (solicitud.signal.aborted) return
-        if (respuesta.status === 401) return sesionVencida()
-        if (!respuesta.ok) throw new Error()
-        const datos = await respuesta.json()
-        if (!solicitud.signal.aborted) setEstados(datos.impresoras)
-      } catch {
-        if (!solicitud.signal.aborted)
-          setErrorEstados(
-            "No se pudo consultar el estado de las impresoras en el asistente.",
-          )
-      }
-    }
-    cargarEstados()
-    const intervalo = setInterval(cargarEstados, 15000)
-    return () => {
-      clearInterval(intervalo)
-      solicitud.abort()
-    }
-  }, [sesionVencida, reconexion])
-
   return (
     <>
-      <Titulo
-        nombre="Impresoras"
-        descripcion="Consulta el inventario de impresoras registradas."
-      />
       <section aria-labelledby="inventario">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <h2 id="inventario" className="text-xl">
@@ -429,6 +387,18 @@ export function Impresoras({
               />
               Canal de impresión · {conexion}
             </p>
+            {cargandoEstados && (
+              <span
+                role="status"
+                className="inline-flex items-center gap-2 text-[10px] text-[#666]"
+              >
+                <Spinner
+                  className="size-3"
+                  etiqueta="Actualizando pendientes"
+                />
+                Actualizando pendientes…
+              </span>
+            )}
             <Configuracion
               configuracion={configuracion}
               estadosEnVivo={estadosEnVivo}
@@ -451,12 +421,20 @@ export function Impresoras({
             {errorEstados}
           </p>
         )}
-        {!error && impresoras === null && (
+        {errorConexion && (
+          <p className="mb-4 text-sm text-red-800" role="alert">
+            {errorConexion}
+          </p>
+        )}
+        {cargando && !error && (
           <p
             className="overflow-hidden rounded-[5px_8px_4px_6px] border-[1.5px] border-[#555] bg-[#f1f1ee] shadow-[2px_2px_0_#aaa] p-5"
             role="status"
           >
-            Cargando impresoras…
+            <span className="inline-flex items-center gap-2">
+              <Spinner className="size-3.5" etiqueta="Cargando impresoras" />
+              Cargando impresoras…
+            </span>
           </p>
         )}
         {impresoras?.length === 0 && (
@@ -487,6 +465,7 @@ export function Impresoras({
                   estados.find((item) => String(item.code) === String(Code))
                     ?.pendientes
                 }
+                cargandoPendientes={cargandoEstados}
               />
             ))}
           </ul>

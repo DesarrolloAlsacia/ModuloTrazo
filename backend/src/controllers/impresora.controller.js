@@ -1,7 +1,7 @@
 const { listarImpresoras } = require("../models/impresora.model")
 
 const baseAsistente = () =>
-  (process.env.IMPRESION_API_URL || "http://172.16.21.150:3000").replace(
+  (process.env.IMPRESION_API_URL || "http://10.0.40.8:5015").replace(
     /\/$/,
     "",
   )
@@ -23,6 +23,13 @@ const FALLOS = {
   listar: "No se pudo consultar el estado en el asistente de impresión.",
   control: "No se pudo consultar el control global del asistente.",
   cambio: "El asistente no confirmó el cambio.",
+}
+
+const ESTADOS_TTL_MS = 15000
+let cacheEstados = { datos: null, momento: 0 }
+
+function invalidarEstados() {
+  cacheEstados = { datos: null, momento: 0 }
 }
 
 const DOCUMENTOS = new Set(["factura", "guia", "ambos"])
@@ -59,9 +66,17 @@ async function listar(req, res) {
 }
 
 async function listarEstados(req, res) {
+  const ahora = Date.now()
+  if (
+    cacheEstados.datos &&
+    ahora - cacheEstados.momento < ESTADOS_TTL_MS
+  ) {
+    return res.json(cacheEstados.datos)
+  }
+
   try {
     const { impresoras } = await asistente()
-    res.json({
+    const datos = {
       impresoras: impresoras.map(
         ({ code, id, modelo, activa, pendientes, fallidos }) => ({
           code,
@@ -72,8 +87,11 @@ async function listarEstados(req, res) {
           fallidos,
         }),
       ),
-    })
+    }
+    cacheEstados = { datos, momento: Date.now() }
+    res.json(datos)
   } catch {
+    if (cacheEstados.datos) return res.json(cacheEstados.datos)
     res.status(502).json({ mensaje: FALLOS.listar })
   }
 }
@@ -109,6 +127,7 @@ async function cambiarEstado(req, res) {
       },
     )
     if (typeof impresora?.activa !== "boolean") throw new Error(FALLOS.cambio)
+    invalidarEstados()
     res.json({ activa: impresora.activa })
   } catch {
     res
@@ -117,9 +136,17 @@ async function cambiarEstado(req, res) {
   }
 }
 
-async function consumirControl(res, ruta, opciones, mensajeError) {
+async function consumirControl(
+  res,
+  ruta,
+  opciones,
+  mensajeError,
+  invalidar = false,
+) {
   try {
-    res.json(conEstado(await asistenteRuta(ruta, opciones)))
+    const datos = conEstado(await asistenteRuta(ruta, opciones))
+    if (invalidar) invalidarEstados()
+    res.json(datos)
   } catch {
     res.status(502).json({ mensaje: mensajeError })
   }
@@ -131,6 +158,7 @@ const cambiarActivo = (activo) => (req, res) =>
     "/api/impresion/" + (activo ? "iniciar" : "detener"),
     { method: "POST" },
     FALLOS.cambio,
+    true,
   )
 
 async function obtenerControl(req, res) {

@@ -1,6 +1,6 @@
 import Link from "next/link"
-import Icon from "../Icon.jsx"
-import { mascotUrl } from "../../lib/branding.js"
+import Icon from "../../../components/ui/Icon.jsx"
+import { mascotUrl } from "../../../lib/branding.js"
 
 const menu = [
   ["dashboard", "grid", "Vista general"],
@@ -9,6 +9,7 @@ const menu = [
   ["impresoras", "server", "Impresoras"],
   ["despliegues", "rocket", "Despliegues"],
   ["alertas", "bell", "Alertas"],
+  ["logs", "terminal", "Logs"],
 ]
 
 export function Layout({ children, ruta, usuario, cerrarSesion }) {

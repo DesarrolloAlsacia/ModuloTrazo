@@ -9,7 +9,7 @@ import {
   useState,
 } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import * as sesion from "./services/login.service.js"
+import * as sesion from "../../lib/services/login.service.js"
 
 const SesionContext = createContext(null)
 

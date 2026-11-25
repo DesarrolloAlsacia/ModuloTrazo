@@ -1,4 +1,6 @@
-import { Titulo, Cabecera, Vacio } from "./components.jsx"
+import { Titulo } from "../../../../components/ui/Titulo.jsx"
+import { Cabecera } from "../../../../components/ui/Cabecera.jsx"
+import { Vacio } from "../../../../components/ui/Vacio.jsx"
 export function Interfaces() {
   return (
     <>
@@ -15,10 +17,18 @@ export function Interfaces() {
           <table className="w-full border-collapse text-left">
             <thead>
               <tr>
-                <th className="border-b border-dashed border-[#aaa] px-[22px] py-[15px] font-[family-name:var(--hand)] text-[11px] text-[#666]">Interfaz</th>
-                <th className="border-b border-dashed border-[#aaa] px-[22px] py-[15px] font-[family-name:var(--hand)] text-[11px] text-[#666]">Servidor</th>
-                <th className="border-b border-dashed border-[#aaa] px-[22px] py-[15px] font-[family-name:var(--hand)] text-[11px] text-[#666]">Estado</th>
-                <th className="border-b border-dashed border-[#aaa] px-[22px] py-[15px] font-[family-name:var(--hand)] text-[11px] text-[#666]">Versión</th>
+                <th className="border-b border-dashed border-[#aaa] px-[22px] py-[15px] font-[family-name:var(--hand)] text-[11px] text-[#666]">
+                  Interfaz
+                </th>
+                <th className="border-b border-dashed border-[#aaa] px-[22px] py-[15px] font-[family-name:var(--hand)] text-[11px] text-[#666]">
+                  Servidor
+                </th>
+                <th className="border-b border-dashed border-[#aaa] px-[22px] py-[15px] font-[family-name:var(--hand)] text-[11px] text-[#666]">
+                  Estado
+                </th>
+                <th className="border-b border-dashed border-[#aaa] px-[22px] py-[15px] font-[family-name:var(--hand)] text-[11px] text-[#666]">
+                  Versión
+                </th>
               </tr>
             </thead>
           </table>

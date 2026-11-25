@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect } from "react"
 import { usePathname } from "next/navigation"
-import { Layout } from "../../components/views/LayoutView.jsx"
-import { ImpresionProvider } from "../../lib/impresion-context.jsx"
-import { useSesion } from "../../lib/sesion-context.jsx"
+import { Layout } from "./_components/LayoutView.jsx"
+import { ImpresionProvider } from "./_hooks/impresion-context.jsx"
+import PantallaCarga from "../../components/ui/PantallaCarga.jsx"
+import { useSesion } from "../_hooks/sesion-context.jsx"
 
 export default function AppLayout({ children }) {
   const { usuario, cerrarSesion } = useSesion()
@@ -25,7 +26,7 @@ export default function AppLayout({ children }) {
   }, [pathname])
 
   if (usuario === undefined || !usuario) {
-    return <p role="status">Cargando Trazo…</p>
+    return <PantallaCarga />
   }
 
   return (

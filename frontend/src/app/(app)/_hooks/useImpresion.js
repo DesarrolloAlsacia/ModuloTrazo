@@ -36,20 +36,28 @@ export function useImpresion(activa) {
   const [estadosEnVivo, setEstadosEnVivo] = useState({})
   const [configuracion, setConfiguracion] = useState(null)
   const [reconexion, setReconexion] = useState(0)
+  const [sincronizado, setSincronizado] = useState(false)
+  const [errorConexion, setErrorConexion] = useState("")
   const solicitarRef = useRef(() => {})
 
   const solicitarSnapshot = useCallback(() => solicitarRef.current(), [])
 
   useEffect(() => {
-    if (!activa) return
+    if (!activa) {
+      setSincronizado(false)
+      setErrorConexion("")
+      return
+    }
     setConexion("Conectando…")
     setTrabajos([])
     setColas([])
     setEstadosEnVivo({})
     setConfiguracion(null)
+    setSincronizado(false)
+    setErrorConexion("")
     const url =
       process.env.NEXT_PUBLIC_IMPRESION_URL ||
-      "http://172.16.21.150:3000/impresion"
+      "http://10.0.40.8:5015/impresion"
 
     const socket = io(url, { autoConnect: false })
     let actualizacion
@@ -63,6 +71,7 @@ export function useImpresion(activa) {
     solicitarRef.current = pedir
     socket.on("connect", () => {
       setConexion("En vivo")
+      setErrorConexion("")
       setEstadosEnVivo({})
       setReconexion((numero) => numero + 1)
       socket.emit("impresion:solicitar")
@@ -75,10 +84,18 @@ export function useImpresion(activa) {
       }))
       pedir()
     })
-    socket.on("disconnect", () => setConexion("Desconectado · última lectura"))
-    socket.on("connect_error", () => setConexion("Sin conexión · reintentando"))
+    socket.on("disconnect", () => {
+      setConexion("Desconectado · última lectura")
+      setErrorConexion("No se pudo mantener la conexión con el asistente de impresión.")
+    })
+    socket.on("connect_error", () => {
+      setConexion("Sin conexión · reintentando")
+      setErrorConexion("No se pudo conectar con el asistente de impresión.")
+    })
     socket.on("impresion:snapshot", (datos) => {
       console.log("[Impresión] snapshot", datos)
+      setSincronizado(true)
+      setErrorConexion("")
       setConfiguracion(normalizarConfiguracion(datos.impresion))
       setColas(Array.isArray(datos.colas) ? datos.colas : [])
       const estadosIniciales = Object.fromEntries(
@@ -165,6 +182,9 @@ export function useImpresion(activa) {
     estadosEnVivo,
     configuracion,
     reconexion,
+    sincronizado,
+    listo: sincronizado || Boolean(errorConexion),
+    errorConexion,
     solicitarSnapshot,
   }
 }

@@ -1,6 +1,8 @@
-import Icon from "../Icon.jsx"
-import { Titulo, Cabecera, Vacio } from "./components.jsx"
-import TrazoAnimado from "./TrazoAnimado.jsx"
+import Icon from "../../../../components/ui/Icon.jsx"
+import { Titulo } from "../../../../components/ui/Titulo.jsx"
+import { Cabecera } from "../../../../components/ui/Cabecera.jsx"
+import { Vacio } from "../../../../components/ui/Vacio.jsx"
+import TrazoAnimado from "../../../../components/ui/TrazoAnimado.jsx"
 
 export function Dashboard() {
   const indicadores = [

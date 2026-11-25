@@ -1,6 +1,6 @@
 import { useId, useRef, useState } from "react"
-import Icon from "../Icon.jsx"
-import * as configuracionApi from "../../lib/services/configuracion.service.js"
+import Icon from "../../../../components/ui/Icon.jsx"
+import * as configuracionApi from "../../../../lib/services/configuracion.service.js"
 
 const DOCUMENTOS = [
   ["factura", "Factura", "Solo facturas"],

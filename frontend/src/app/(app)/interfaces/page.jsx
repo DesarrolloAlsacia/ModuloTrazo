@@ -1,7 +1,7 @@
 "use client"
 
-import { Interfaces } from "../../../components/views/InterfacesView.jsx"
-import { useDatos } from "../../../lib/impresion-context.jsx"
+import { Interfaces } from "./_components/InterfacesView.jsx"
+import { useDatos } from "../_hooks/impresion-context.jsx"
 
 export default function InterfacesPage() {
   return <Interfaces {...useDatos()} />

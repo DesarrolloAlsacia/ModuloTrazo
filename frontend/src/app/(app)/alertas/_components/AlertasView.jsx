@@ -1,4 +1,6 @@
-import { Titulo, Cabecera, Vacio } from "./components.jsx"
+import { Titulo } from "../../../../components/ui/Titulo.jsx"
+import { Cabecera } from "../../../../components/ui/Cabecera.jsx"
+import { Vacio } from "../../../../components/ui/Vacio.jsx"
 export function Alertas() {
   return (
     <>

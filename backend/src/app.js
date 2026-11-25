@@ -7,6 +7,9 @@ require("dotenv").config({ path: path.join(__dirname, "../.env"), quiet: true })
 const loginRoutes = require("./routes/login.routes")
 const impresoraRoutes = require("./routes/impresora.routes")
 const controlRoutes = require("./routes/control.routes")
+const logsRoutes = require("./routes/logs.routes")
+const servidoresRoutes = require("./routes/servidores.routes")
+const { adjuntarLogsWebSocket } = require("./websockets/logs")
 const app = express()
 const browser = path.join(__dirname, "../../frontend/dist/browser")
 
@@ -15,6 +18,8 @@ app.use(express.json({ limit: "64kb" }))
 app.use("/api/auth", loginRoutes)
 app.use("/api/impresoras", impresoraRoutes)
 app.use("/api/impresion", controlRoutes)
+app.use("/api/logs", logsRoutes)
+app.use("/api/servidores", servidoresRoutes)
 app.use("/api", (req, res) =>
   res
     .status(404)
@@ -32,7 +37,11 @@ if (require.main === module) {
   const server = app.listen(port, host, () =>
     console.log(`Trazo: http://${host}:${port}`),
   )
-  const cerrar = () => server.close(() => process.exit(0))
+  const logsWs = adjuntarLogsWebSocket(server)
+  const cerrar = () => {
+    logsWs.cerrar()
+    server.close(() => process.exit(0))
+  }
   process.on("SIGINT", cerrar)
   process.on("SIGTERM", cerrar)
   process.on("message", (mensaje) => {

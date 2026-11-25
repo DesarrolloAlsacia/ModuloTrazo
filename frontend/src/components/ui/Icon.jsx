@@ -87,6 +87,13 @@ const dibujos = {
       <path d="M4 22v-3a8 8 0 0 1 16 0v3" />{" "}
     </>
   ),
+  search: (
+    <>
+      {" "}
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-4-4" />{" "}
+    </>
+  ),
 }
 
 export default function Icon({ name, className = "" }) {

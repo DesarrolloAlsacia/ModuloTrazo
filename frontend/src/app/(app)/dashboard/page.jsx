@@ -1,8 +1,16 @@
 "use client"
 
-import { Dashboard } from "../../../components/views/DashboardView.jsx"
-import { useDatos } from "../../../lib/impresion-context.jsx"
+import CapaCarga from "../../../components/ui/CapaCarga.jsx"
+import { Dashboard } from "./_components/DashboardView.jsx"
+import { useDatos } from "../_hooks/impresion-context.jsx"
 
 export default function DashboardPage() {
-  return <Dashboard {...useDatos()} />
+  const datos = useDatos()
+
+  return (
+    <>
+      <Dashboard {...datos} />
+      <CapaCarga listo={datos.listo} mensaje="Cargando datos del tablero…" />
+    </>
+  )
 }
